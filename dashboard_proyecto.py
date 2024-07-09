@@ -52,7 +52,7 @@ print(check('SPPT',colnec))
 
 for j in colnec:
     if check(j,coldf) == False:
-        print(f'El dataframe no contiene los datos de {j}')
+        print(f'El dataframe no contiene los datos de {j}, por favor revise los datos de origen.')
         if j == 'MW':
             while(True):# Bucle infinito
                 try:# Excepción.
