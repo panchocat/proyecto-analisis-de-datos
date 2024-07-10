@@ -12,7 +12,7 @@ import plotly.graph_objects as go#proporciona objetos que contribuyen hacer traz
 df = pd.read_excel('D:\Cursos\Analisis de datos y graficos con python\parametros de perforación ejercicio.xlsx')# se crea la variable df leyendo la información de un archivo .xlsx
 #df1 = df.set_index("DEPTH")# cremos un nuevo dataframe cambiando el indice del df que se generó por defecto al leer el archivo por uno presonalizado que en este caso va a ser "DEPTH"
 #df.set_index("DEPTH", inplace=True)
-dfl = len(df["MD"])# Calculamos y almacenamos el valor de la longitud de la serie HOLE DEPTH del df en la variable dfl.
+dfl = len(df["MD"])# Calculamos y almacenamos el valor de la longitud de la serie MD del df en la variable dfl.
 dmax = df["MD"].max()# almacenamos en una variable el valor minimo de la columna DEPTH.
 dmin = df["MD"].min()# almacenamos en una variable el valor maximo de la columna DEPTH.
 #mwl = df["MW"].head().isnull()# muestra si los primeros 5 valores de la columna MW esta vacios.
@@ -20,12 +20,6 @@ dmin = df["MD"].min()# almacenamos en una variable el valor maximo de la columna
 #mwl2 = df.at[0,'MW']# muestra el valor de una celda.
 #dfs = df.shape# método que permite consultar la dimensión que tiene el data frame y lo entrega en una tubla,se almacena la consulta en la variable dfs.
 
-'''
-# Bloque de codigo que permite leer el nombre de las columnas de un df y almacenarlos en una lista
-columnas = []
-for col in df:# recorró el indice de las columnas del df.
-    columnas.append(col)
-'''  
 
 #print(columnas)
 print(df)
@@ -36,6 +30,7 @@ print(dmax)
 #print(mwl1)
 #print(mwl2)
 
+# Bloque de codigo que permite leer el nombre de las columnas de un df y almacenarlos en una lista
 coldf = []
 for i in df:
     coldf.append(i)
@@ -48,69 +43,78 @@ def check (ncol, list):
         return False
     
 colnec = ['MD','SPP','CAUDAL','MW']
-print(check('SPPT',colnec))
+
 
 for j in colnec:
-    if check(j,coldf) == False:
-        print(f'El dataframe no contiene los datos de {j}, por favor revise los datos de origen.')
-        if j == 'MW':
-            while(True):# Bucle infinito
-                try:# Excepción.
-                    mw = float(input("Ingrese el valor del peso del lodo: "))
-                    break# rompe el bucle infinito.
-                except ValueError:# si el error es debido al dato que ingreso, lo informa.
-                    print('Debe ingresar un número')
+    eval1 = j != "MW"
+    eval2 = check(j,coldf) == False
+    if eval2 & eval1:
+        print(f'El dataframe no contiene los datos de {j}, por favor revise los datos de origen y vuelva a correr el programa.')
+        break
+    if j == "MW":
+        print('El dataframe no contiene los datos de "MW", ingrese esa información:')
+        while(True):# Bucle infinito
+            try:# Excepción.
+                mw = float(input("Ingrese el valor del peso del lodo: "))
+                break# rompe el bucle infinito.
+            except ValueError:# si el error es debido al dato que ingreso, lo informa.
+                print('Debe ingresar un número')
 
-            while(True):
-                try:
-                    intermin = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde empieza este peso de lodo: "))
-                    break
-                except ValueError:# si el error es debido al dato que ingreso, lo informa.
-                    print('Debe ingresar un número')
-    
-            while(True):    
-                try:
-                    intermax = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde finaliza este peso de lodo: "))
-                    break
-                except ValueError:# si el error es debido al dato que ingreso, lo informa.
-                    print('Debe ingresar un número')
+        while(True):
+            try:
+                intermin = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde empieza este peso de lodo: "))
+                break
+            except ValueError:# si el error es debido al dato que ingreso, lo informa.
+                print('Debe ingresar un número')
             
-            df.set_index("MD", inplace=True)# cambiamos el indice del df que se generó por defecto en pandas por uno presonalizado que en este caso va a ser "DEPTH"
-            for i in range (intermin,intermax+1):
-                df.at[i,'MW'] = mw # Almacenamos en una celda especifica el valor mw.
-            while (True):
-                consultar = input("Quieres ingresar mas valores de MW? S/N: ")
-                if consultar == "N":
-                    print("Gracia por ingresar la información!!!")
-                    break
-                elif consultar == "S":
-        
-                    while(True):
-                        try:
-                            mw = float(input("Ingrese el valor del peso del lodo: "))
-                            break
-                        except ValueError:# si el error es debido al dato que ingreso, lo informa.
-                            print('Debe ingresar un número')
+        while(True):    
+            try:
+                intermax = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde finaliza este peso de lodo: "))
+                break
+            except ValueError:# si el error es debido al dato que ingreso, lo informa.
+                print('Debe ingresar un número')
+                    
+        df.set_index("MD", inplace=True)# cambiamos el indice del df que se generó por defecto en pandas por uno presonalizado que en este caso va a ser "DEPTH"
+        for i in range (intermin,intermax+1):
+            df.at[i,'MW'] = mw # Almacenamos en una celda especifica el valor mw.
+        while (True):
+            consultar = input("Quieres ingresar mas valores de MW? S/N: ")
+            if consultar == "N":
+                print("Gracia por ingresar la información!!!")
+                break
+            elif consultar == "S":
                 
-                    while(True):
-                        try:
-                            intermin = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde empieza este peso de lodo: "))
-                            break
-                        except ValueError:# si el error es debido al dato que ingreso, lo informa.
-                            print('Debe ingresar un número')
-                    while(True):    
-                        try:
-                            intermax = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde finaliza este peso de lodo:"))
-                            break
-                        except ValueError:# si el error es debido al dato que ingreso, lo informa.
-                            print('Debe ingresar un número')       
-            
+                while(True):
+                    try:
+                        mw = float(input("Ingrese el valor del peso del lodo: "))
+                        break
+                    except ValueError:# si el error es debido al dato que ingreso, lo informa.
+                        print('Debe ingresar un número')
+                        
+                while(True):
+                    try:
+                        intermin = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde empieza este peso de lodo: "))
+                        break
+                    except ValueError:# si el error es debido al dato que ingreso, lo informa.
+                        print('Debe ingresar un número')
+                while(True):    
+                    try:
+                        intermax = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde finaliza este peso de lodo:"))
+                        break
+                    except ValueError:# si el error es debido al dato que ingreso, lo informa.
+                        print('Debe ingresar un número')       
+                    
+                
+                        
+                df.at[i,'MW'] = mw#guarda el valor mw en la posición que se encuentra en la fila con nombre fila y la columna de con nombre columna del DataFrame df.
+                        
+            else:
+                print("No seleccionó una de las opciones validas")
         
-                    df.at[i,'MW'] = mw#guarda el valor mw en la posición que se encuentra en la fila con nombre fila y la columna de con nombre columna del DataFrame df.
-                else:
-                    print("No seleccionó una de las opciones validas")
-    else:
-        continue
+        break
+        
+    # else:
+    #     continue
 
 print('La información del dataframe está completa, a continuación se generará la gráfica de correlación de presiones')      
 df.reset_index(inplace=True)# cambiamos el indice del df que personalizamos por el que estaba por defecto.
