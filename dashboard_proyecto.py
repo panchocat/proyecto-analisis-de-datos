@@ -13,12 +13,12 @@ df = pd.read_excel('D:\Cursos\Analisis de datos y graficos con python\parametros
 #df1 = df.set_index("DEPTH")# cremos un nuevo dataframe cambiando el indice del df que se generó por defecto al leer el archivo por uno presonalizado que en este caso va a ser "DEPTH"
 #df.set_index("DEPTH", inplace=True)
 dfl = len(df["MD"])# Calculamos y almacenamos el valor de la longitud de la serie MD del df en la variable dfl.
-dmax = df["MD"].max()# almacenamos en una variable el valor minimo de la columna DEPTH.
-dmin = df["MD"].min()# almacenamos en una variable el valor maximo de la columna DEPTH.
+dmax = df["MD"].max()# almacenamos en una variable el valor minimo de la columna "MD".
+dmin = df["MD"].min()# almacenamos en una variable el valor maximo de la columna "MD".
 #mwl = df["MW"].head().isnull()# muestra si los primeros 5 valores de la columna MW esta vacios.
 #mwl1 = df.loc[[0],['MW']]# muestra el valor de una celda con el nombre de la columna y el numero de la fila.
 #mwl2 = df.at[0,'MW']# muestra el valor de una celda.
-#dfs = df.shape# método que permite consultar la dimensión que tiene el data frame y lo entrega en una tubla,se almacena la consulta en la variable dfs.
+#dfs = df.shape# método que permite consultar la dimensión que tiene el df y lo entrega en una tubla,se almacena la consulta en la variable dfs.
 
 
 #print(columnas)
@@ -30,44 +30,50 @@ print(dmax)
 #print(mwl1)
 #print(mwl2)
 
-# Bloque de codigo que permite leer el nombre de las columnas de un df y almacenarlos en una lista
+# Bloque de codigo que lee el nombre de las columnas de un df y los almacena en una lista.
 coldf = []
 for i in df:
     coldf.append(i)
 print(coldf)
 
+# Función que verifica si un dato está en una lista.
 def check (ncol, list):
     if ncol in list:
         return True
     else:
         return False
     
+# Lista con la información que debe tener la data para poder analizarla y generar el grafico.
 colnec = ['MD','SPP','CAUDAL','MW']
 
 
+
+# Bloque de codigo que analiza si la información cargada tiene la información necesaria para poder procesarla, si no la tiene 
+# enviara un mensaje notificando que información hace falte o ayudara acompletarla si el valor que hace falta es "MW", 
+# si la información esta completa procederá a procesarla y generar el grafico.
 for j in colnec:
     eval1 = j != "MW"
     eval2 = check(j,coldf) == False
-    if eval2 & eval1:
+    if eval2 & eval1: # estructura de control que indica si el df no contiene la información necesaria.
         print(f'El dataframe no contiene los datos de {j}, por favor revise los datos de origen y vuelva a correr el programa.')
         break
-    if j == "MW":
+    if j == "MW": # Si el df no tiene la información del parámetro "MW", lo informa y solicita que ingrese esa información.
         print('El dataframe no contiene los datos de "MW", ingrese esa información:')
-        while(True):# Bucle infinito
+        while(True):# Bucle infinito que corre un bloque de codigo solicitando el valor del parametro "MW" y asegura que se ingrese el valor correcto, evitando que programa se bloquee por un error de dato incompatible.
             try:# Excepción.
                 mw = float(input("Ingrese el valor del peso del lodo: "))
                 break# rompe el bucle infinito.
             except ValueError:# si el error es debido al dato que ingreso, lo informa.
                 print('Debe ingresar un número')
 
-        while(True):
+        while(True):# Bucle infinito que corre un bloque de codigo solicitando el valor inicio donde se debe empezar a almacenar dato "MW" solicitado antes, tambien asegura que se ingrese el valor correcto, evitando que programa se bloquee por un error de dato incompatible.
             try:
                 intermin = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde empieza este peso de lodo: "))
                 break
             except ValueError:# si el error es debido al dato que ingreso, lo informa.
                 print('Debe ingresar un número')
             
-        while(True):    
+        while(True):# Bucle infinito que corre un bloque de codigo que solicita el valor final donde se debe terminar de almacenar dato "MW" solicitado antes, tambien asegura que se ingrese el valor correcto, evitando que programa se bloquee por un error de dato incompatible.    
             try:
                 intermax = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde finaliza este peso de lodo: "))
                 break
@@ -75,13 +81,20 @@ for j in colnec:
                 print('Debe ingresar un número')
                     
         df.set_index("MD", inplace=True)# cambiamos el indice del df que se generó por defecto en pandas por uno presonalizado que en este caso va a ser "DEPTH"
-        for i in range (intermin,intermax+1):
-            df.at[i,'MW'] = mw # Almacenamos en una celda especifica el valor mw.
-        while (True):
+        
+        for i in range (intermin,intermax+1):# iteración que permite guardar en el df los datos solicitados anteriormente.
+            df.at[i,'MW'] = mw # Almacena en una celda especifica del df el dato mw.
+        
+        while (True):# Bucle infinito, corre un bloque de codigo que consulta si el usuario quiere seguir ingrasando información, tambien asegura que se ingrese el valor correcto, evitando que programa se bloquee por un error de dato incompatible.
             consultar = input("Quieres ingresar mas valores de MW? S/N: ")
+            
             if consultar == "N":
                 print("Gracia por ingresar la información!!!")
+                print('La información del dataframe está completa, a continuación se generará la gráfica de correlación de presiones')       
+                df.reset_index(inplace=True)# cambiamos el indice del df que personalizamos por el que estaba por defecto.
+                print(df)
                 break
+            
             elif consultar == "S":
                 
                 while(True):
@@ -97,6 +110,7 @@ for j in colnec:
                         break
                     except ValueError:# si el error es debido al dato que ingreso, lo informa.
                         print('Debe ingresar un número')
+                
                 while(True):    
                     try:
                         intermax = int(input(f"Ingrese el valor de profundidad(este valor no puede estar por debajo de {dmin} y ni por encima de {dmax}) donde finaliza este peso de lodo:"))
@@ -107,18 +121,17 @@ for j in colnec:
                 
                         
                 df.at[i,'MW'] = mw#guarda el valor mw en la posición que se encuentra en la fila con nombre fila y la columna de con nombre columna del DataFrame df.
-                        
+                
             else:
                 print("No seleccionó una de las opciones validas")
         
-        break
+        #break
         
     # else:
     #     continue
 
-print('La información del dataframe está completa, a continuación se generará la gráfica de correlación de presiones')      
-df.reset_index(inplace=True)# cambiamos el indice del df que personalizamos por el que estaba por defecto.
-print(df)
+      
+
     
 
         
