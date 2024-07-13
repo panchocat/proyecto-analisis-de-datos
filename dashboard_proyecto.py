@@ -1,15 +1,15 @@
 import pandas as pd #es una librería de Python especializada en el manejo y análisis de estructuras de datos.
 import xlwings as xw #es una librería de Python que  permite comunicarse con excel para intercambiar informacion y compartir funcionalidades.
 #Plotly es una biblioteca de visualización de datos en Python que permite crear gráficos interactivos y personalizados para explorar y representar datos de manera efectiva.
-import plotly.express as px# sub libreripermite visualizar nuestros gráficos de forma inmediata
-import plotly.graph_objects as go#proporciona objetos que contribuyen hacer trazos en los gráficos. Permite personalizar los gráficos.
+import plotly.express as px# sub libreria que permite visualizar nuestros gráficos de forma inmediata
+import plotly.graph_objects as go#proporciona objetos que contribuyen a hacer gráficos mas complejos o elaborados. Permite personalizar los gráficos.
 #import matplotlib.pyplot as plt# llamamos las librerias que vamos a necesitar para analizar y graficar datos.
 #import matplotlib.patheffects as pa
 
 
 
 #df = pd.read_csv('D:\Cursos\Analisis de datos y graficos con python\PARAMETROS BROCA 8.5_RB2004H.csv', sep=';')# se crea la variable df leyendo la información de un archivo .csv
-df = pd.read_excel('D:\Cursos\Analisis de datos y graficos con python\parametros de perforación ejercicio.xlsx')# se crea la variable df leyendo la información de un archivo .xlsx
+df = pd.read_excel('D:\Cursos\Analisis de datos y graficos con python\parametros de perforación ejercicio.xlsx')# se crea la variable df que permite almacenar la información de un archivo .xlsx
 #df1 = df.set_index("DEPTH")# cremos un nuevo dataframe cambiando el indice del df que se generó por defecto al leer el archivo por uno presonalizado que en este caso va a ser "DEPTH"
 #df.set_index("DEPTH", inplace=True)
 dfl = len(df["MD"])# Calculamos y almacenamos el valor de la longitud de la serie MD del df en la variable dfl.
@@ -48,9 +48,9 @@ colnec = ['MD','SPP','CAUDAL','MW']
 
 
 
-# Bloque de codigo que analiza si la información cargada tiene la información necesaria para poder procesarla, si no la tiene 
-# enviara un mensaje notificando que información hace falte o ayudara acompletarla si el valor que hace falta es "MW", 
-# si la información esta completa procederá a procesarla y generar el grafico.
+# Bloque de codigo que analiza si la información cargada tiene los datos necesarios para poder procesarla y generar 
+# el grafico de analisis de presión de operación, si no la tiene enviara un mensaje notificando que información hace falte
+# ó ayudara acompletarla si el valor que hace falta es "MW".
 for j in colnec:
     eval1 = j != "MW"
     eval2 = check(j,coldf) == False
@@ -217,9 +217,9 @@ wb = openpyxl.load_workbook('D:\Cursos\Analisis de datos y graficos con python\T
 ws = wb['REP ING 1']
 ws['C20'] = df.at[2,"SPMT"]
 wb.save('D:\Cursos\Analisis de datos y graficos con python\output\TGT REPORTE DIARIO INGENIERIA 02 QUIFA 931H 23-04-2023.xlsx')
+'''
 
-
-# Bloque de codigo que permite compartir información con un archivo excel para crear una nueva columna llamada "SPPT" y generar los valores de la columna.
+# Bloque de codigo que permite compartir información y funcionalidades con un archivo excel para crear una nueva columna en el df llamada "SPPT" y generar los valores de la columna.
 wb = xw.Book('D:\Cursos\Analisis de datos y graficos con python\TGT REPORTE DIARIO INGENIERIA 03 QUIFA 931H 24-04-2023.xlsx')
 ws = wb.sheets['REP ING 1']
 for i in range(0,dfl):
@@ -228,23 +228,30 @@ for i in range(0,dfl):
     ws['C224'].value = df.at[i,"MW"]
     df.at[i,'SPPT'] = ws['D215'].value
     
-#Bloque de codigo que crea dos nuevas columnas ('SPPT5%+' y 'SPPT5%-') en el dataframe con sus respctivos valores.
+# Bloque de codigo que crea dos nuevas columnas ('SPPT5%+' y 'SPPT5%-') en el dataframe con sus respctivos valores.
 for j in range(0,dfl):
     df.at[j,'SPPT5%+']  = df.at[j,'SPPT']*5/100 + df.at[j,'SPPT']
     df.at[j,'SPPT5%-']  = df.at[j,'SPPT'] - df.at[j,'SPPT']*5/100 
 
 print(df)
-print(df['SPPT'].dtype)# muestra que tipo de dato esta almacenado la columna.
+print(df['SPPT'].dtype)# muestra que tipo de dato está almacenado en la columna.
 print(df['SPP'].dtype)
 #
+
+'''
 fig = px.line(df, x = df.MD, y = df.SPPT, title="sample figure")
 fig.show()
-
-
-# Bloque de codigo que permite crear un grafica para visualizar información del df.
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=df.MD, y=df.SPP, mode='lines', line_color='green'))
-fig.add_trace(go.Scatter(x=df.MD, y=df.SPPT,mode='lines', line_color='indigo'))
-
-fig.show()
 '''
+
+# Bloque de código que permite crear un grafica usando la libreria PLOTLY para visualizar información del df.
+
+fig = go.Figure() #Crea el objeto figura.
+fig.add_trace(go.Scatter(x=df.MD, y=df['SPPT'],name = 'SPPT',mode='lines', line_color='indigo'))
+fig.add_trace(go.Scatter(x=df.MD, y=df['SPPT5%+'],name = 'SPPT5%+', line=dict(color='royalblue', width=4,dash='dash'),fill='tonexty'))
+fig.add_trace(go.Scatter(x=df.MD, y=df['SPPT'],name = 'SPPT',mode='lines', line_color='indigo',showlegend=False))
+fig.add_trace(go.Scatter(x=df.MD, y=df['SPPT5%-'],name = 'SPPT5%-', line=dict(color='royalblue', width=4,dash='dash'),fill='tonexty'))
+fig.add_trace(go.Scatter(x=df.MD, y=df.SPP,name = 'SPP',mode='lines', line_color='green'))
+fig.update_layout(title='Análisis de presión de operación', xaxis_title='Depth(ft)', yaxis_title='Presión(psi)',template='plotly_white')
+fig.show()
+
+# Bloque de código que permite crear un grafica usando la libreria MATPLOTLIB para visualizar información del df.
